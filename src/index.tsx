@@ -1,105 +1,90 @@
 import {
   ButtonItem,
   definePlugin,
-  DialogButton,
-  Menu,
-  MenuItem,
+  gamepadDialogClasses,
   PanelSection,
   PanelSectionRow,
+  quickAccessControlsClasses,
   Router,
   ServerAPI,
-  showContextMenu,
+  SidebarNavigation,
   staticClasses,
 } from "decky-frontend-lib";
-import { VFC } from "react";
-import { FaShip } from "react-icons/fa";
+import { Fragment, VFC } from "react";
+import { ImStack } from "react-icons/im";
 
-import logo from "../assets/logo.png";
-
-// interface AddMethodArgs {
-//   left: number;
-//   right: number;
-// }
+import { PyInterop } from "./PyInterop";
+import { ReorderableListTester } from "./testing-window/ReorderableListTest";
 
 const Content: VFC<{ serverAPI: ServerAPI }> = ({}) => {
-  // const [result, setResult] = useState<number | undefined>();
-
-  // const onClick = async () => {
-  //   const result = await serverAPI.callPluginMethod<AddMethodArgs, number>(
-  //     "add",
-  //     {
-  //       left: 2,
-  //       right: 2,
-  //     }
-  //   );
-  //   if (result.success) {
-  //     setResult(result.result);
-  //   }
-  // };
 
   return (
-    <PanelSection title="Panel Section">
-      <PanelSectionRow>
-        <ButtonItem
-          layout="below"
-          onClick={(e) =>
-            showContextMenu(
-              <Menu label="Menu" cancelText="CAAAANCEL" onCancel={() => {}}>
-                <MenuItem onSelected={() => {}}>Item #1</MenuItem>
-                <MenuItem onSelected={() => {}}>Item #2</MenuItem>
-                <MenuItem onSelected={() => {}}>Item #3</MenuItem>
-              </Menu>,
-              e.currentTarget ?? window
-            )
-          }
-        >
-          Server says yolo
-        </ButtonItem>
-      </PanelSectionRow>
+    <Fragment>
+      <style>{`
+        .scope {
+          width: inherit;
+          height: inherit;
 
-      <PanelSectionRow>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <img src={logo} />
-        </div>
-      </PanelSectionRow>
+          flex: 1 1 1px;
+          scroll-padding: 48px 0px;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          align-content: stretch;
+        }
+        .scope .${quickAccessControlsClasses.PanelSection} {
+          padding: 0px;
+        }
 
-      <PanelSectionRow>
-        <ButtonItem
-          layout="below"
-          onClick={() => {
-            Router.CloseSideMenus();
-            Router.Navigate("/decky-plugin-test");
-          }}
-        >
-          Router
-        </ButtonItem>
-      </PanelSectionRow>
-    </PanelSection>
+        .scope .${gamepadDialogClasses.FieldChildren} {
+          margin: 0px 16px;
+        }
+        
+        .scope .${gamepadDialogClasses.FieldLabel} {
+          margin-left: 16px;
+        }
+      `}</style>
+      <div className="scope">
+        <PanelSection>
+          <PanelSectionRow>
+            <ButtonItem layout="below" onClick={() => { Router.CloseSideMenus(); Router.Navigate("/component-tester"); }} >
+              Open Tester
+            </ButtonItem>
+          </PanelSectionRow>
+        </PanelSection>
+      </div>
+    </Fragment>
   );
 };
 
-const DeckyPluginRouterTest: VFC = () => {
+const TestingWindowRouter: VFC = () => {
   return (
-    <div style={{ marginTop: "50px", color: "white" }}>
-      Hello World!
-      <DialogButton onClick={() => Router.NavigateToLibraryTab()}>
-        Go to Library
-      </DialogButton>
-    </div>
+    <SidebarNavigation
+      title="Component Tester"
+      showTitle
+      pages={[
+        {
+          title: "Reorderable List",
+          content: <ReorderableListTester />,
+          route: "/component-tester/reorderable-list-tester",
+        }
+      ]}
+    />
   );
 };
 
 export default definePlugin((serverApi: ServerAPI) => {
-  serverApi.routerHook.addRoute("/decky-plugin-test", DeckyPluginRouterTest, {
-    exact: true,
-  });
+  PyInterop.setServer(serverApi);
+  serverApi.routerHook.addRoute("/component-tester", () => (
+    <TestingWindowRouter />
+  ));
 
   return {
-    title: <div className={staticClasses.Title}>Example Plugin</div>,
+    title: <div className={staticClasses.Title}>Component Tester</div>,
     content: <Content serverAPI={serverApi} />,
-    icon: <FaShip />,
+    icon: <ImStack />,
     onDismount() {
-      serverApi.routerHook.removeRoute("/decky-plugin-test");
+      serverApi.routerHook.removeRoute("/component-tester");
     },
   };
 });
