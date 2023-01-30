@@ -17,7 +17,6 @@ import { PyInterop } from "./PyInterop";
 import { ReorderableListTester } from "./testing-window/ReorderableListTest";
 
 const Content: VFC<{ serverAPI: ServerAPI }> = ({}) => {
-
   return (
     <Fragment>
       <style>{`
