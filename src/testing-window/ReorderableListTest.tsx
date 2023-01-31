@@ -26,7 +26,15 @@ export function ReorderableListTester() {
     }
   ];
 
+  function onAction(entryReference: ReorderableEntry<string>): void {
+    console.log(`Do normal menu function for ${entryReference.label}. Ex: Reload, Disable, Uninstall, etc.`) // #FIXME#
+  }
+
+  function onSave(entries: ReorderableEntry<string>[]): void {
+    console.log("Saving reorderable list...");
+  }
+
   return (
-    <ReorderableList entries={entries}/>
+    <ReorderableList<string> entries={entries} onAction={onAction} onSave={onSave}/>
   );
 }
