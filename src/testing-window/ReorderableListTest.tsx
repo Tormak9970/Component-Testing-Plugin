@@ -7,19 +7,21 @@ import { ReorderableEntry, ReorderableList } from "../components/ReorderableList
 export function ReorderableListTester() {
   let entries: ReorderableEntry<string>[] = [
     {
-      id: "decky-autoflatpaks",
+      id: "bash-shortcuts",
       label: "Bash Shortcuts",
       data: "data",
-      position: 0
+      position: 0,
+      alert: true
     },
     {
-      id: "decky-autosuspend",
+      id: "css-loader",
       label: "CSS Loader",
       data: "data",
-      position: 1
+      position: 1,
+      alert: false
     },
     {
-      id: "sdh-cssloader",
+      id: "power-tools",
       label: "Power Tools",
       data: "data",
       position: 2
@@ -31,7 +33,7 @@ export function ReorderableListTester() {
   }
 
   function onSave(entries: ReorderableEntry<string>[]): void {
-    console.log("Saving reorderable list...");
+    console.log("Saving reorderable list...", entries);
   }
 
   return (

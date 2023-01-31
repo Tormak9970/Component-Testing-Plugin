@@ -2,11 +2,32 @@ import { DialogButton, Field, Focusable, GamepadButton, gamepadDialogClasses, qu
 import { Fragment, useState } from "react"
 import { FaEllipsisH } from "react-icons/fa"
 
+interface NotificationBadgeProps {
+  show?: boolean;
+}
+
+function NotificationBadge(props:NotificationBadgeProps) {
+  return props.show ? (
+    <div
+      style={{
+        position: 'absolute',
+        top: 'calc(50% - 5px)',
+        right: '90px',
+        height: '10px',
+        width: '10px',
+        background: 'orange',
+        borderRadius: '50%'
+      }}
+    />
+  ) : null;
+}
+
 export type ReorderableEntry<T> = {
   id: string,
   label: string,
   data?:T,
-  position:number
+  position:number,
+  alert?:boolean
 }
 
 type ListProps<T> = {
@@ -17,6 +38,8 @@ type ListProps<T> = {
 
 /**
  * A component for creating reorderable lists.
+ * 
+ * Implementation example can be found {@link https://github.com/Tormak9970/Component-Testing-Plugin/blob/main/src/testing-window/ReorderableListTest.tsx here}
  */
 export function ReorderableList<T>(props: ListProps<T>) {
   const [entryList, setEntryList] = useState<ReorderableEntry<T>[]>(props.entries.sort((a:ReorderableEntry<T>, b:ReorderableEntry<T>) => a.position - b.position));
@@ -138,7 +161,8 @@ function ReorderableItem<T>(props: ListEntryProps<T>) {
   return(
     // @ts-ignore
     <Field label={props.entryData.label} style={props.reorderEnabled ? {...baseCssProps, background: "#678BA670"} : {...baseCssProps}}>
-      <Focusable style={{ display: "flex", width: "100%" }} onButtonDown={onReorder}>
+      <Focusable style={{ display: "flex", width: "100%", position: "relative" }} onButtonDown={onReorder}>
+        <NotificationBadge show={!!props.entryData.alert} />
         <DialogButton style={{ minWidth: "30px", maxWidth: "60px", display: "flex", justifyContent: "center", alignItems: "center" }} onClick={() => props.onAction(props.entryData)} onOKButton={() => props.onAction(props.entryData)}>
           <FaEllipsisH />
         </DialogButton>
