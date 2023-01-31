@@ -23,7 +23,6 @@ function NotificationBadge(props:NotificationBadgeProps) {
 }
 
 export type ReorderableEntry<T> = {
-  id: string,
   label: string,
   data?:T,
   position:number,

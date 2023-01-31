@@ -7,21 +7,18 @@ import { ReorderableEntry, ReorderableList } from "../components/ReorderableList
 export function ReorderableListTester() {
   let entries: ReorderableEntry<string>[] = [
     {
-      id: "bash-shortcuts",
       label: "Bash Shortcuts",
       data: "data",
       position: 0,
       alert: true
     },
     {
-      id: "css-loader",
       label: "CSS Loader",
       data: "data",
       position: 1,
       alert: false
     },
     {
-      id: "power-tools",
       label: "Power Tools",
       data: "data",
       position: 2
