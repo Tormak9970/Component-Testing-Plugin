@@ -33,7 +33,7 @@ type ListProps<T> = {
   entries: ReorderableEntry<T>[],
   onAction: (entryReference: ReorderableEntry<T>) => void,
   onSave: (entries: ReorderableEntry<T>[]) => void,
-  updateComponent?: JSXElementConstructor<{entry:ReorderableEntry<T>}>
+  secondButton?: JSXElementConstructor<{entry:ReorderableEntry<T>}>
 }
 
 /**
@@ -98,7 +98,7 @@ export function ReorderableList<T>(props: ListProps<T>) {
           {
             entryList.map((entry: ReorderableEntry<T>) => (
               <ReorderableItem listData={entryList} entryData={entry} reorderEntryFunc={setEntryList} reorderEnabled={reorderEnabled} onAction={props.onAction}>
-                {entry.alert && props.updateComponent ? <props.updateComponent entry={entry} /> : ""}
+                {entry.alert && props.secondButton ? <props.secondButton entry={entry} /> : ""}
               </ReorderableItem>
             ))
           }
