@@ -1,26 +1,26 @@
 import { DialogButton, Field, Focusable, GamepadButton, gamepadDialogClasses, quickAccessControlsClasses } from "decky-frontend-lib"
-import { Fragment, useState } from "react"
+import { Fragment, JSXElementConstructor, useState } from "react"
 import { FaEllipsisH } from "react-icons/fa"
 
-interface NotificationBadgeProps {
-  show?: boolean;
-}
+// interface NotificationBadgeProps {
+//   show?: boolean;
+// }
 
-function NotificationBadge(props:NotificationBadgeProps) {
-  return props.show ? (
-    <div
-      style={{
-        position: 'absolute',
-        top: 'calc(50% - 5px)',
-        right: '90px',
-        height: '10px',
-        width: '10px',
-        background: 'orange',
-        borderRadius: '50%'
-      }}
-    />
-  ) : null;
-}
+// function NotificationBadge(props:NotificationBadgeProps) {
+//   return props.show ? (
+//     <div
+//       style={{
+//         position: 'absolute',
+//         top: 'calc(50% - 5px)',
+//         right: '90px',
+//         height: '10px',
+//         width: '10px',
+//         background: 'orange',
+//         borderRadius: '50%'
+//       }}
+//     />
+//   ) : null;
+// }
 
 export type ReorderableEntry<T> = {
   label: string,
@@ -32,7 +32,8 @@ export type ReorderableEntry<T> = {
 type ListProps<T> = {
   entries: ReorderableEntry<T>[],
   onAction: (entryReference: ReorderableEntry<T>) => void,
-  onSave: (entries: ReorderableEntry<T>[]) => void
+  onSave: (entries: ReorderableEntry<T>[]) => void,
+  updateComponent?: JSXElementConstructor<{entry:ReorderableEntry<T>}>
 }
 
 /**
@@ -96,12 +97,9 @@ export function ReorderableList<T>(props: ListProps<T>) {
           onClick={toggleReorderEnabled}>
           {
             entryList.map((entry: ReorderableEntry<T>) => (
-              <ReorderableItem
-                listData={entryList}
-                entryData={entry}
-                reorderEntryFunc={setEntryList}
-                reorderEnabled={reorderEnabled}
-                onAction={props.onAction} />
+              <ReorderableItem listData={entryList} entryData={entry} reorderEntryFunc={setEntryList} reorderEnabled={reorderEnabled} onAction={props.onAction}>
+                {entry.alert && props.updateComponent ? <props.updateComponent entry={entry} /> : ""}
+              </ReorderableItem>
             ))
           }
         </Focusable>
@@ -115,7 +113,8 @@ type ListEntryProps<T> = {
   entryData: ReorderableEntry<T>,
   reorderEntryFunc: CallableFunction,
   reorderEnabled: boolean,
-  onAction: (entryReference: ReorderableEntry<T>) => void
+  onAction: (entryReference: ReorderableEntry<T>) => void,
+  children:any
 }
 
 function ReorderableItem<T>(props: ListEntryProps<T>) {
@@ -161,7 +160,8 @@ function ReorderableItem<T>(props: ListEntryProps<T>) {
     // @ts-ignore
     <Field label={props.entryData.label} style={props.reorderEnabled ? {...baseCssProps, background: "#678BA670"} : {...baseCssProps}}>
       <Focusable style={{ display: "flex", width: "100%", position: "relative" }} onButtonDown={onReorder}>
-        <NotificationBadge show={!!props.entryData.alert} />
+        {/* <NotificationBadge show={!!props.entryData.alert} /> */}
+        {props.children}
         <DialogButton style={{ minWidth: "30px", maxWidth: "60px", display: "flex", justifyContent: "center", alignItems: "center" }} onClick={() => props.onAction(props.entryData)} onOKButton={() => props.onAction(props.entryData)}>
           <FaEllipsisH />
         </DialogButton>
