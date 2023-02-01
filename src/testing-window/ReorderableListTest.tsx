@@ -30,6 +30,8 @@ function UpdateButton(props:UpdateButtonProps<PluginData>) {
         <DialogButton
           style={{ height: '40px', minWidth: '60px', marginRight: '10px' }}
           onClick={() => requestPluginInstall(props.entry.label, data?.update)}
+          onOKButton={() => requestPluginInstall(props.entry.label, data?.update)}
+          onOKActionDescription="Update Plugin"
         >
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             Update to {data?.update?.name}
@@ -51,18 +53,16 @@ export function ReorderableListTester() {
       label: "Bash Shortcuts",
       data: {
         update: {
-          name: "Bash Shortcuts v1.3.0",
+          name: "1.3.0",
           hash: "",
           artifact: ""
         }
       },
-      position: 0,
-      alert: true
+      position: 0
     },
     {
       label: "CSS Loader",
-      position: 1,
-      alert: false
+      position: 1
     },
     {
       label: "Power Tools",

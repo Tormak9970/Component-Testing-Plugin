@@ -1,32 +1,11 @@
 import { DialogButton, Field, Focusable, GamepadButton, gamepadDialogClasses, quickAccessControlsClasses } from "decky-frontend-lib"
-import { Fragment, JSXElementConstructor, useState } from "react"
+import { Fragment, JSXElementConstructor, ReactElement, useState } from "react"
 import { FaEllipsisH } from "react-icons/fa"
-
-// interface NotificationBadgeProps {
-//   show?: boolean;
-// }
-
-// function NotificationBadge(props:NotificationBadgeProps) {
-//   return props.show ? (
-//     <div
-//       style={{
-//         position: 'absolute',
-//         top: 'calc(50% - 5px)',
-//         right: '90px',
-//         height: '10px',
-//         width: '10px',
-//         background: 'orange',
-//         borderRadius: '50%'
-//       }}
-//     />
-//   ) : null;
-// }
 
 export type ReorderableEntry<T> = {
   label: string,
   data?:T,
-  position:number,
-  alert?:boolean
+  position:number
 }
 
 type ListProps<T> = {
@@ -39,7 +18,7 @@ type ListProps<T> = {
 /**
  * A component for creating reorderable lists.
  * 
- * Implementation example can be found {@link https://github.com/Tormak9970/Component-Testing-Plugin/blob/main/src/testing-window/ReorderableListTest.tsx here}
+ * Implementation example can be found {@link https://github.com/Tormak9970/Component-Testing-Plugin/blob/main/src/testing-window/ReorderableListTest.tsx here}.
  */
 export function ReorderableList<T>(props: ListProps<T>) {
   const [entryList, setEntryList] = useState<ReorderableEntry<T>[]>(props.entries.sort((a:ReorderableEntry<T>, b:ReorderableEntry<T>) => a.position - b.position));
@@ -57,7 +36,7 @@ export function ReorderableList<T>(props: ListProps<T>) {
   return (
     <Fragment>
       <style>{`
-        .reorderable-cope {
+        .reorderable-list {
           width: inherit;
           height: inherit;
 
@@ -68,29 +47,29 @@ export function ReorderableList<T>(props: ListProps<T>) {
           justify-content: flex-start;
           align-content: stretch;
         }
-        .reorderable-cope .${quickAccessControlsClasses.PanelSection} {
+        .reorderable-list .${quickAccessControlsClasses.PanelSection} {
           padding: 0px;
         }
 
-        .reorderable-cope .${gamepadDialogClasses.FieldChildren} {
+        .reorderable-list .${gamepadDialogClasses.FieldChildren} {
           margin: 0px 16px;
         }
         
-        .reorderable-cope .${gamepadDialogClasses.FieldLabel} {
+        .reorderable-list .${gamepadDialogClasses.FieldLabel} {
           margin-left: 16px;
         }
 
-        .reorderable-cope .custom-buttons {
+        .reorderable-list .custom-buttons {
           width: inherit;
           height: inherit;
           display: inherit;
         }
 
-        .reorderable-cope .custom-buttons .${gamepadDialogClasses.FieldChildren} {
+        .reorderable-list .custom-buttons .${gamepadDialogClasses.FieldChildren} {
           margin: 0px 16px;
         }
       `}</style>
-      <div className="reorderable-cope">
+      <div className="reorderable-list">
         <Focusable
           onSecondaryButton={toggleReorderEnabled}
           onSecondaryActionDescription={reorderEnabled ? "Save Order" : "Reorder"}
@@ -98,7 +77,7 @@ export function ReorderableList<T>(props: ListProps<T>) {
           {
             entryList.map((entry: ReorderableEntry<T>) => (
               <ReorderableItem listData={entryList} entryData={entry} reorderEntryFunc={setEntryList} reorderEnabled={reorderEnabled} onAction={props.onAction}>
-                {entry.alert && props.secondButton ? <props.secondButton entry={entry} /> : ""}
+                {props.secondButton ? <props.secondButton entry={entry} /> : null}
               </ReorderableItem>
             ))
           }
@@ -114,18 +93,18 @@ type ListEntryProps<T> = {
   reorderEntryFunc: CallableFunction,
   reorderEnabled: boolean,
   onAction: (entryReference: ReorderableEntry<T>) => void,
-  children:any
+  children:ReactElement|null
 }
 
 function ReorderableItem<T>(props: ListEntryProps<T>) {
-  let listEntries = props.listData;
+  const listEntries = props.listData;
 
   function onReorder(e: Event): void {
     if (!props.reorderEnabled) return;
 
-    let event = e as CustomEvent;
-    let currentIdx = listEntries.findIndex((entryData: ReorderableEntry<T>) => entryData === props.entryData);
-    let currentIdxValue = listEntries[currentIdx];
+    const event = e as CustomEvent;
+    const currentIdx = listEntries.findIndex((entryData: ReorderableEntry<T>) => entryData === props.entryData);
+    const currentIdxValue = listEntries[currentIdx];
     if (currentIdx < 0) return;
 
     let targetPosition: number = -1;
@@ -135,11 +114,10 @@ function ReorderableItem<T>(props: ListEntryProps<T>) {
       targetPosition = currentIdxValue.position-1;
     } 
 
-    // #FIXME# If you want to add more conditionals here
-    if (targetPosition >= listEntries.length || targetPosition < 0) return; // Return if invalid position
+    if (targetPosition >= listEntries.length || targetPosition < 0) return;
 
     let otherToUpdate = listEntries.find((entryData: ReorderableEntry<T>) => entryData.position === targetPosition);
-    if (!otherToUpdate) return; // couldn't find next
+    if (!otherToUpdate) return;
 
     let currentPosition = currentIdxValue.position;
 
@@ -160,7 +138,6 @@ function ReorderableItem<T>(props: ListEntryProps<T>) {
     // @ts-ignore
     <Field label={props.entryData.label} style={props.reorderEnabled ? {...baseCssProps, background: "#678BA670"} : {...baseCssProps}}>
       <Focusable style={{ display: "flex", width: "100%", position: "relative" }} onButtonDown={onReorder}>
-        {/* <NotificationBadge show={!!props.entryData.alert} /> */}
         {props.children}
         <DialogButton style={{ minWidth: "30px", maxWidth: "60px", display: "flex", justifyContent: "center", alignItems: "center" }} onClick={() => props.onAction(props.entryData)} onOKButton={() => props.onAction(props.entryData)}>
           <FaEllipsisH />
