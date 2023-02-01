@@ -120,8 +120,8 @@ function ReorderableItem<T>(props: ListEntryProps<T>) {
 
   return(
     // @ts-ignore
-    <Field label={props.entryData.label} style={props.reorderEnabled ? {...baseCssProps, background: "#678BA670"} : {...baseCssProps}} {...props.fieldProps}>
-      <Focusable style={{ display: "flex", width: "100%", position: "relative" }} onButtonDown={onReorder}>
+    <Field label={props.entryData.label} style={props.reorderEnabled ? {...baseCssProps, background: "#678BA670"} : {...baseCssProps}} {...props.fieldProps} focusable={!props.children} onButtonDown={onReorder}>
+      <Focusable style={{ display: "flex", width: "100%", position: "relative" }}>
         {props.children}
       </Focusable>
     </Field>
