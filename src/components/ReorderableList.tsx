@@ -1,6 +1,5 @@
-import { DialogButton, Field, Focusable, GamepadButton } from "decky-frontend-lib"
-import { Fragment, JSXElementConstructor, ReactElement, useState } from "react"
-import { FaEllipsisH } from "react-icons/fa"
+import { Field, FieldProps, Focusable, GamepadButton } from "decky-frontend-lib";
+import { Fragment, JSXElementConstructor, ReactElement, useState } from "react";
 
 export type ReorderableEntry<T> = {
   label: string,
@@ -10,9 +9,9 @@ export type ReorderableEntry<T> = {
 
 type ListProps<T> = {
   entries: ReorderableEntry<T>[],
-  onAction: (entryReference: ReorderableEntry<T>) => void,
   onSave: (entries: ReorderableEntry<T>[]) => void,
-  secondButton?: JSXElementConstructor<{entry:ReorderableEntry<T>}>
+  interactables?: JSXElementConstructor<{entry:ReorderableEntry<T>}>,
+  fieldProps?: FieldProps
 }
 
 /**
@@ -61,8 +60,8 @@ export function ReorderableList<T>(props: ListProps<T>) {
           onClick={toggleReorderEnabled}>
           {
             entryList.map((entry: ReorderableEntry<T>) => (
-              <ReorderableItem listData={entryList} entryData={entry} reorderEntryFunc={setEntryList} reorderEnabled={reorderEnabled} onAction={props.onAction}>
-                {props.secondButton ? <props.secondButton entry={entry} /> : null}
+              <ReorderableItem listData={entryList} entryData={entry} reorderEntryFunc={setEntryList} reorderEnabled={reorderEnabled} fieldProps={props.fieldProps}>
+                {props.interactables ? <props.interactables entry={entry} /> : null}
               </ReorderableItem>
             ))
           }
@@ -73,11 +72,11 @@ export function ReorderableList<T>(props: ListProps<T>) {
 }
 
 type ListEntryProps<T> = {
+  fieldProps?: FieldProps,
   listData: ReorderableEntry<T>[],
   entryData: ReorderableEntry<T>,
   reorderEntryFunc: CallableFunction,
   reorderEnabled: boolean,
-  onAction: (entryReference: ReorderableEntry<T>) => void,
   children:ReactElement|null
 }
 
@@ -121,12 +120,9 @@ function ReorderableItem<T>(props: ListEntryProps<T>) {
 
   return(
     // @ts-ignore
-    <Field label={props.entryData.label} style={props.reorderEnabled ? {...baseCssProps, background: "#678BA670"} : {...baseCssProps}}>
+    <Field label={props.entryData.label} style={props.reorderEnabled ? {...baseCssProps, background: "#678BA670"} : {...baseCssProps}} {...props.fieldProps}>
       <Focusable style={{ display: "flex", width: "100%", position: "relative" }} onButtonDown={onReorder}>
         {props.children}
-        <DialogButton style={{ height: "40px", minWidth: "40px", width: "40px", display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }} onClick={() => props.onAction(props.entryData)} onOKButton={() => props.onAction(props.entryData)}>
-          <FaEllipsisH />
-        </DialogButton>
       </Focusable>
     </Field>
   );

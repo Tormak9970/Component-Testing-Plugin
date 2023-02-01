@@ -1,6 +1,6 @@
 import { DialogButton } from "decky-frontend-lib";
 import { ReorderableEntry, ReorderableList } from "../components/ReorderableList";
-import { FaDownload } from "react-icons/fa";
+import { FaDownload, FaEllipsisH } from "react-icons/fa";
 import { Fragment } from "react";
 
 interface StorePluginVersion {
@@ -43,6 +43,35 @@ function UpdateButton(props:UpdateButtonProps<PluginData>) {
   );
 }
 
+type ActionButtonProps<T> = {
+  entry: ReorderableEntry<T>
+}
+
+function ActionButtion(props:ActionButtonProps<PluginData>){
+  function onAction(entryReference: ReorderableEntry<PluginData>): void {
+    console.log(`Do normal menu function for ${entryReference.label}. Ex: Reload, Disable, Uninstall, etc.`) // #FIXME#
+  }
+
+  return (
+    <DialogButton style={{ height: "40px", minWidth: "40px", width: "40px", display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }} onClick={() => onAction(props.entry)} onOKButton={() => onAction(props.entry)}>
+      <FaEllipsisH />
+    </DialogButton>
+  );
+}
+
+type InteractablesProps<T> = {
+  entry: ReorderableEntry<T>
+}
+
+function Interactables(props:InteractablesProps<PluginData>) {
+  return (
+    <Fragment>
+      <UpdateButton entry={props.entry} />
+      <ActionButtion  entry={props.entry} />
+    </Fragment>
+  );
+}
+
 /**
  * Creates a ReorderableList testing window.
  * @returns The ReorderableList testing window.
@@ -73,15 +102,11 @@ export function ReorderableListTester() {
     }
   ];
 
-  function onAction(entryReference: ReorderableEntry<PluginData>): void {
-    console.log(`Do normal menu function for ${entryReference.label}. Ex: Reload, Disable, Uninstall, etc.`) // #FIXME#
-  }
-
   function onSave(entries: ReorderableEntry<PluginData>[]): void {
     console.log("Saving reorderable list...", entries);
   }
 
   return (
-    <ReorderableList<PluginData> entries={entries} onAction={onAction} onSave={onSave} secondButton={UpdateButton}/>
+    <ReorderableList<PluginData> entries={entries} onSave={onSave} interactables={Interactables}/>
   );
 }
