@@ -18,7 +18,7 @@ type UpdateButtonProps<T> = {
 }
 
 function requestPluginInstall(name?:string, update?:StorePluginVersion) {
-
+  console.log(`Updating ${name} to version ${update?.name}`);
 }
 
 function UpdateButton(props:UpdateButtonProps<PluginData>) {
