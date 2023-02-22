@@ -1,8 +1,11 @@
 import { Field, FieldProps, Focusable, GamepadButton } from "decky-frontend-lib";
-import { CSSProperties, Fragment, JSXElementConstructor, ReactElement, useEffect, useState } from "react";
+import { Fragment, JSXElementConstructor, ReactElement, useEffect, useState } from "react";
 
 /**
  * A ReorderableList entry of type <T>.
+ * @param label The name of this entry in the list.
+ * @param data Optional data to connect to this entry.
+ * @param position The position of this entry in the list.
  */
 export type ReorderableEntry<T> = {
   label: string,
@@ -12,12 +15,15 @@ export type ReorderableEntry<T> = {
 
 /**
  * Properties for a ReorderableList component of type <T>.
+ * 
+ * @param animate If the list should animate. @default true
  */
 type ListProps<T> = {
   entries: ReorderableEntry<T>[],
   onSave: (entries: ReorderableEntry<T>[]) => void,
   interactables?: JSXElementConstructor<{entry:ReorderableEntry<T>}>,
-  fieldProps?: FieldProps
+  fieldProps?: FieldProps,
+  animate?: boolean
 }
 
 /**
@@ -26,6 +32,7 @@ type ListProps<T> = {
  * See an example implementation {@linkplain https://github.com/Tormak9970/Component-Testing-Plugin/blob/main/src/testing-window/ReorderableListTest.tsx here}.
  */
 export function ReorderableList<T>(props: ListProps<T>) {
+  if (props.animate === undefined) props.animate = true;
   const [entryList, setEntryList] = useState<ReorderableEntry<T>[]>(props.entries.sort((a:ReorderableEntry<T>, b:ReorderableEntry<T>) => a.position - b.position));
   const [reorderEnabled, setReorderEnabled] = useState<boolean>(false);
 
@@ -60,7 +67,7 @@ export function ReorderableList<T>(props: ListProps<T>) {
           onClick={toggleReorderEnabled}>
           {
             entryList.map((entry: ReorderableEntry<T>) => (
-              <ReorderableItem listData={entryList} entryData={entry} reorderEntryFunc={setEntryList} reorderEnabled={reorderEnabled} fieldProps={props.fieldProps}>
+              <ReorderableItem listData={entryList} entryData={entry} reorderEntryFunc={setEntryList} reorderEnabled={reorderEnabled} fieldProps={props.fieldProps} animate={props.animate as boolean} >
                 {props.interactables ? <props.interactables entry={entry} /> : null}
               </ReorderableItem>
             ))
@@ -80,10 +87,13 @@ type ListEntryProps<T> = {
   entryData: ReorderableEntry<T>,
   reorderEntryFunc: CallableFunction,
   reorderEnabled: boolean,
+  animate: boolean,
   children:ReactElement|null
 }
 
 function ReorderableItem<T>(props: ListEntryProps<T>) {
+  const [isSelected, _setIsSelected] = useState<boolean>(false);
+  const [isSelectedLastFrame, setIsSelectedLastFrame] = useState<boolean>(false);
   const listEntries = props.listData;
 
   function onReorder(e: Event): void {
@@ -96,10 +106,10 @@ function ReorderableItem<T>(props: ListEntryProps<T>) {
 
     let targetPosition: number = -1;
     if (event.detail.button == GamepadButton.DIR_DOWN) {
-      targetPosition = currentIdxValue.position+1;
+      targetPosition = currentIdxValue.position + 1;
     } else if (event.detail.button == GamepadButton.DIR_UP) {
-      targetPosition = currentIdxValue.position-1;
-    } 
+      targetPosition = currentIdxValue.position - 1;
+    }
 
     if (targetPosition >= listEntries.length || targetPosition < 0) return;
 
@@ -111,28 +121,44 @@ function ReorderableItem<T>(props: ListEntryProps<T>) {
     currentIdxValue.position = otherToUpdate.position;
     otherToUpdate.position = currentPosition;
 
-    props.reorderEntryFunc([...listEntries].sort((a:ReorderableEntry<T>, b:ReorderableEntry<T>) => a.position - b.position));
+    props.reorderEntryFunc(
+      [...listEntries].sort((a: ReorderableEntry<T>, b: ReorderableEntry<T>) => a.position - b.position),
+    );
   }
 
-  const baseCssProps:CSSProperties = {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%"
-  };
+  async function setIsSelected(val: boolean) {
+    _setIsSelected(val);
+    // Wait 3 frames, then set. I have no idea why, but if you dont wait long enough it doesn't work.
+    for (let i = 0; i < 3; i++) await new Promise((res) => requestAnimationFrame(res));
+    setIsSelectedLastFrame(val);
+  }
+
 
   return(
+    <div
+    style={
+      props.animate
+        ? {
+            transition:
+              isSelected || isSelectedLastFrame
+                ? ''
+                : 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1)', // easeOutQuart https://easings.net/#easeOutQuart
+            transform: !props.reorderEnabled || isSelected ? 'scale(1)' : 'scale(0.9)',
+            opacity: !props.reorderEnabled || isSelected ? 1 : 0.7,
+          }
+        : {}
+    }
+  >
     <Field
       label={props.entryData.label}
-      // @ts-ignore
-      style={props.reorderEnabled ? {...baseCssProps, background: "#678BA670"} : {...baseCssProps}}
       {...props.fieldProps}
       focusable={!props.children}
       onButtonDown={onReorder}
+      onGamepadBlur={() => setIsSelected(false)}
+      onGamepadFocus={() => setIsSelected(true)}
     >
-      <Focusable style={{ display: "flex", width: "100%", position: "relative" }}>
-        {props.children}
-      </Focusable>
+      <Focusable style={{ display: 'flex', width: '100%', position: 'relative' }}>{props.children}</Focusable>
     </Field>
+  </div>
   );
 }
