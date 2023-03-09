@@ -14,6 +14,7 @@ import { Fragment, VFC } from "react";
 import { ImStack } from "react-icons/im";
 
 import { PyInterop } from "./PyInterop";
+import { MultiSelectTester } from "./testing-window/MultiSelectTest";
 import { ReorderableListTester } from "./testing-window/ReorderableListTest";
 
 const Content: VFC<{ serverAPI: ServerAPI }> = ({}) => {
@@ -66,6 +67,11 @@ const TestingWindowRouter: VFC = () => {
           title: "Reorderable List",
           content: <ReorderableListTester />,
           route: "/component-tester/reorderable-list-tester",
+        },
+        {
+          title: "Multi Select",
+          content: <MultiSelectTester />,
+          route: "/component-tester/multi-select-tester",
         }
       ]}
     />
