@@ -25,6 +25,6 @@ export function MultiSelectTester() {
   ];
 
   return (
-    <MultiSelect options={options} selected={selected} />
+    <MultiSelect options={options} label="Select a hook" selected={selected} />
   );
 }

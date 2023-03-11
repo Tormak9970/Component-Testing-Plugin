@@ -1,14 +1,16 @@
-import { ButtonItem, Dropdown, DropdownOption, Focusable } from "decky-frontend-lib";
-import { useState, VFC, Fragment, useEffect } from "react";
+import { DialogButton, Dropdown, DropdownOption, Field, FieldProps, Focusable } from "decky-frontend-lib";
+import { useState, VFC, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
 
 /**
  * The properties for the MultiSelectedOption component.
  * @param option This entry's option.
  * @param onRemove The function to run when the user deselects this option.
+ * @param fieldProps Optional fieldProps for this entry.
  */
 type MultiSelectedOptionProps = {
   option: DropdownOption,
+  fieldProps?: FieldProps,
   onRemove: (option: DropdownOption) => void
 }
 
@@ -17,11 +19,19 @@ type MultiSelectedOptionProps = {
  * @param props The MultiSelectedOptionProps for this component.
  * @returns A MultiSelectedOption component.
  */
-const MultiSelectedOption:VFC<MultiSelectedOptionProps> = ({ option, onRemove }) => {
+const MultiSelectedOption:VFC<MultiSelectedOptionProps> = ({ option, fieldProps, onRemove }) => {
   return (
-    <div style={{ display: "flex", flexDirection: "row" }}>
-      <div>{option.label}</div>
-      <ButtonItem onClick={() => onRemove(option)} icon={<FaTimes />} tooltip={`Remove ${option.label}`} />
+    <div>
+      <Field
+        label={option.label}
+        {...fieldProps}
+      >
+        <Focusable style={{ display: 'flex', width: '100%', position: 'relative' }}>
+          <DialogButton style={{ height: "40px", minWidth: "40px", width: "40px", display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }} onClick={() => onRemove(option)} onOKButton={() => onRemove(option)} onOKActionDescription={`Remove ${option.label}`}>
+            <FaTimes />
+          </DialogButton>
+        </Focusable>
+      </Field>
     </div>
   );
 }
@@ -30,12 +40,18 @@ const MultiSelectedOption:VFC<MultiSelectedOptionProps> = ({ option, onRemove })
  * The properties for the MultiSelect component.
  * @param options The list of all possible options for the component.
  * @param selected The list of currently selected options.
+ * @param label The label of the dropdown.
+ * @param onChange Optional callback function to run when selected values change.
  * @param maxOptions Optional prop to limit the amount of selectable options.
+ * @param fieldProps Optional fieldProps for the MultiSelect entries.
  */
 export type MultiSelectProps = {
   options: DropdownOption[],
   selected: DropdownOption[],
-  maxOptions?: number;
+  label: string,
+  onChange?: (selected:DropdownOption[]) => void,
+  maxOptions?: number,
+  fieldProps?: FieldProps,
 }
 
 /**
@@ -43,14 +59,15 @@ export type MultiSelectProps = {
  * @param props The MultiSelectProps for this component.
  * @returns A MultiSelect component.
  */
-export const MultiSelect:VFC<MultiSelectProps> = ({ options, selected, maxOptions }) => {
+export const MultiSelect:VFC<MultiSelectProps> = ({ options, selected, label, onChange = () => {}, maxOptions, fieldProps }) => {
   const [ sel, setSel ] = useState(selected);
   const [ available, setAvailable ] = useState(options.filter((opt) => !selected.includes(opt)));
-  const [ dropLabel, setDropLabel ] = useState("Select an option");
+  const [ dropLabel, setDropLabel ] = useState(label);
 
   useEffect(() => {
     setAvailable(options.filter((opt) => !sel.includes(opt)));
-    setDropLabel(available.length == 0 ? "No more options" : (maxOptions && selected.length == maxOptions ? "Max selected" : "Select an option"));
+    setDropLabel(available.length == 0 ? "All selected" : (maxOptions && selected.length == maxOptions ? "Max selected" : label));
+    onChange(selected);
   }, [sel]);
 
   const onRemove = (option: DropdownOption) => {
@@ -58,18 +75,28 @@ export const MultiSelect:VFC<MultiSelectProps> = ({ options, selected, maxOption
     setSel(selected);
   }
 
-  const onChange = (option: DropdownOption) => {
+  const onSelectedChange = (option: DropdownOption) => {
     selected = [...sel, option];
     setSel(selected);
   }
 
   return (
-    <Focusable>
+    <Focusable
+      style={{
+        // width: "inherit",
+        // height: "inherit",
+        // flex: "1 1 1px",
+        // scrollPadding: "48px 0px",
+        // display: "flex",
+        // flexDirection: "column",
+        // justifyContent: "flex-start",
+        // alignContent: "stretch"
+      }}>
       <div style={{ width: "100%", marginBottom: "14px" }}>
-        {sel.map((option) => <MultiSelectedOption option={option} onRemove={onRemove} />)}
+        {sel.map((option) => <MultiSelectedOption option={option} onRemove={onRemove} fieldProps={fieldProps} />)}
       </div>
       <div className="multi-selected__options">
-        <Dropdown rgOptions={available} selectedOption={dropLabel} onChange={onChange} strDefaultLabel={dropLabel} focusable={true} />
+        <Dropdown rgOptions={available} selectedOption={dropLabel} onChange={onSelectedChange} strDefaultLabel={dropLabel} focusable={true} />
       </div>
     </Focusable>
   );
