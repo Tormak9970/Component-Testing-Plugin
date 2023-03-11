@@ -21,15 +21,13 @@ type MultiSelectedOptionProps = {
  */
 const MultiSelectedOption:VFC<MultiSelectedOptionProps> = ({ option, fieldProps, onRemove }) => {
   return (
-    <div>
-      <Field label={option.label} {...fieldProps} >
-        <Focusable style={{ display: 'flex', width: '100%', position: 'relative' }}>
-          <DialogButton style={{ height: "40px", minWidth: "40px", width: "40px", display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }} onClick={() => onRemove(option)} onOKButton={() => onRemove(option)} onOKActionDescription={`Remove ${option.label}`}>
-            <FaTimes />
-          </DialogButton>
-        </Focusable>
-      </Field>
-    </div>
+    <Field label={option.label} {...fieldProps} >
+      <Focusable style={{ display: 'flex', width: '100%', position: 'relative' }}>
+        <DialogButton style={{ height: "40px", minWidth: "40px", width: "40px", display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }} onClick={() => onRemove(option)} onOKButton={() => onRemove(option)} onOKActionDescription={`Remove ${option.label}`}>
+          <FaTimes />
+        </DialogButton>
+      </Focusable>
+    </Field>
   );
 }
 
@@ -62,13 +60,16 @@ export const MultiSelect:VFC<MultiSelectProps> = ({ options, selected, label, on
   const [ dropLabel, setDropLabel ] = useState(label);
 
   useEffect(() => {
-    setAvailable(options.filter((opt) => !sel.includes(opt)));
-    setDropLabel(available.length == 0 ? "All selected" : (maxOptions && selected.length == maxOptions ? "Max selected" : label));
+    const avail = options.filter((opt) => !sel.includes(opt));
+    setAvailable(avail);
+    setDropLabel(avail.length == 0 ? "All selected" : (!!maxOptions && selected.length == maxOptions ? "Max selected" : label));
     onChange(selected);
   }, [sel]);
 
   const onRemove = (option: DropdownOption) => {
-    selected = sel.splice(sel.indexOf(option), 1);
+    const ref = [...sel];
+    ref.splice(sel.indexOf(option), 1);
+    selected = ref;
     setSel(selected);
   }
 
@@ -82,9 +83,7 @@ export const MultiSelect:VFC<MultiSelectProps> = ({ options, selected, label, on
       <div style={{ width: "100%", marginBottom: "14px" }}>
         {sel.map((option) => <MultiSelectedOption option={option} onRemove={onRemove} fieldProps={fieldProps} />)}
       </div>
-      <div className="multi-selected__options">
-        <Dropdown rgOptions={available} selectedOption={dropLabel} onChange={onSelectedChange} strDefaultLabel={dropLabel} focusable={true} />
-      </div>
+      <Dropdown rgOptions={available} selectedOption={dropLabel} onChange={onSelectedChange} strDefaultLabel={dropLabel} focusable={true} disabled={available.length == 0 || (!!maxOptions && selected.length == maxOptions)} />
     </Focusable>
   );
 }

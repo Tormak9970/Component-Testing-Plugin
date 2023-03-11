@@ -30,25 +30,17 @@ Note: If you are receiving build errors due to an out of date library, you shoul
 pnpm update decky-frontend-lib --latest
 ```
 
-### Distribution
+## Contents
 
-Layout of a plugin zip ready for testing:
-```
-pluginname-v1.0.0.zip (version number is optional but recommended for users sake)
-   |
-   pluginname/ <directory>
-   |  |  |
-   |  |  bin/ <directory> (optional)
-   |  |     |
-   |  |     binary (optional)
-   |  |
-   |  dist/ <directory> [required]
-   |      |
-   |      index.js [required]
-   | 
-   package.json [required]
-   plugin.json [required]
-   main.py {required if you are using the python backend of decky-loader: serverAPI}
-   README.md (optional but recommended)
-   LICENSE(.md) [required, filename should be roughly similar, suffix not needed]
-```
+### Reorderable List
+![reorderable list](assets/reorderable-list.png)
+<br/>
+A customizeable list component that supports reordering its entries.
+<br/>
+
+### Multi Select
+![multi select](assets/multi-select.png)
+<br/>
+A customizeable dropdown that supports selecting multiple options.
+<br/>
+<br/>
