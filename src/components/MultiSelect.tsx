@@ -22,10 +22,7 @@ type MultiSelectedOptionProps = {
 const MultiSelectedOption:VFC<MultiSelectedOptionProps> = ({ option, fieldProps, onRemove }) => {
   return (
     <div>
-      <Field
-        label={option.label}
-        {...fieldProps}
-      >
+      <Field label={option.label} {...fieldProps} >
         <Focusable style={{ display: 'flex', width: '100%', position: 'relative' }}>
           <DialogButton style={{ height: "40px", minWidth: "40px", width: "40px", display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }} onClick={() => onRemove(option)} onOKButton={() => onRemove(option)} onOKActionDescription={`Remove ${option.label}`}>
             <FaTimes />
@@ -81,17 +78,7 @@ export const MultiSelect:VFC<MultiSelectProps> = ({ options, selected, label, on
   }
 
   return (
-    <Focusable
-      style={{
-        // width: "inherit",
-        // height: "inherit",
-        // flex: "1 1 1px",
-        // scrollPadding: "48px 0px",
-        // display: "flex",
-        // flexDirection: "column",
-        // justifyContent: "flex-start",
-        // alignContent: "stretch"
-      }}>
+    <Focusable>
       <div style={{ width: "100%", marginBottom: "14px" }}>
         {sel.map((option) => <MultiSelectedOption option={option} onRemove={onRemove} fieldProps={fieldProps} />)}
       </div>
