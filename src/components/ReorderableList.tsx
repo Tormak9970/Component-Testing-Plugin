@@ -49,6 +49,13 @@ export function ReorderableList<T>(props: ListProps<T>) {
     }
   }
 
+  function saveOnBackout(e: Event) {
+    const event = e as CustomEvent;
+    if (event.detail.button == GamepadButton.CANCEL) {
+      toggleReorderEnabled();
+    }
+  }
+
   return (
     <Fragment>
       <div style={{
@@ -64,7 +71,9 @@ export function ReorderableList<T>(props: ListProps<T>) {
         <Focusable
           onSecondaryButton={toggleReorderEnabled}
           onSecondaryActionDescription={reorderEnabled ? "Save Order" : "Reorder"}
-          onClick={toggleReorderEnabled}>
+          onClick={toggleReorderEnabled}
+          onButtonDown={saveOnBackout}
+          >
           {
             entryList.map((entry: ReorderableEntry<T>) => (
               <ReorderableItem listData={entryList} entryData={entry} reorderEntryFunc={setEntryList} reorderEnabled={reorderEnabled} fieldProps={props.fieldProps} animate={props.animate as boolean} >

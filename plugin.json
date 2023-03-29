@@ -1,9 +1,9 @@
 {
   "name": "Component Tester",
   "author": "Tormak",
-  "flags": ["debug", "_root"],
+  "flags": ["debug", "dev"],
   "publish": {
-    "tags": ["template", "root"],
+    "tags": ["components", "testing", "dfl"],
     "description": "Plugin for quick component itteration and testing.",
     "image": "https://opengraph.githubassets.com/1/SteamDeckHomebrew/PluginLoader"
   }
