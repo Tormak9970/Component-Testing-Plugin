@@ -1,5 +1,6 @@
 import { Field, FieldProps, Focusable, GamepadButton } from "decky-frontend-lib";
-import { Fragment, JSXElementConstructor, ReactElement, useEffect, useState } from "react";
+import { Fragment, JSXElementConstructor, ReactElement, useEffect, useState } from 'react';
+
 
 /**
  * A ReorderableList entry of type <T>.
@@ -8,32 +9,34 @@ import { Fragment, JSXElementConstructor, ReactElement, useEffect, useState } fr
  * @param position The position of this entry in the list.
  */
 export type ReorderableEntry<T> = {
-  label: string,
-  data?:T,
-  position:number
-}
+  label: string;
+  data?: T;
+  position: number;
+};
 
 /**
  * Properties for a ReorderableList component of type <T>.
- * 
+ *
  * @param animate If the list should animate. @default true
  */
-type ListProps<T> = {
-  entries: ReorderableEntry<T>[],
-  onSave: (entries: ReorderableEntry<T>[]) => void,
-  interactables?: JSXElementConstructor<{entry:ReorderableEntry<T>}>,
-  fieldProps?: FieldProps,
-  animate?: boolean
-}
+export type ReorderableListProps<T> = {
+  entries: ReorderableEntry<T>[];
+  onSave: (entries: ReorderableEntry<T>[]) => void;
+  interactables?: JSXElementConstructor<{ entry: ReorderableEntry<T> }>;
+  fieldProps?: FieldProps;
+  animate?: boolean;
+};
 
 /**
  * A component for creating reorderable lists.
- * 
+ *
  * See an example implementation {@linkplain https://github.com/Tormak9970/Component-Testing-Plugin/blob/main/src/testing-window/ReorderableListTest.tsx here}.
  */
-export function ReorderableList<T>(props: ListProps<T>) {
+export function ReorderableList<T>(props: ReorderableListProps<T>) {
   if (props.animate === undefined) props.animate = true;
-  const [entryList, setEntryList] = useState<ReorderableEntry<T>[]>(props.entries.sort((a:ReorderableEntry<T>, b:ReorderableEntry<T>) => a.position - b.position));
+  const [entryList, setEntryList] = useState<ReorderableEntry<T>[]>(
+    props.entries.sort((a: ReorderableEntry<T>, b: ReorderableEntry<T>) => a.position - b.position),
+  );
   const [reorderEnabled, setReorderEnabled] = useState<boolean>(false);
 
   useEffect(() => {
@@ -44,43 +47,51 @@ export function ReorderableList<T>(props: ListProps<T>) {
     let newReorderValue = !reorderEnabled;
     setReorderEnabled(newReorderValue);
 
-    if (!newReorderValue){
+    if (!newReorderValue) {
       props.onSave(entryList);
     }
   }
 
   function saveOnBackout(e: Event) {
     const event = e as CustomEvent;
-    if (event.detail.button == GamepadButton.CANCEL) {
-      toggleReorderEnabled();
+    if (event.detail.button == GamepadButton.CANCEL && reorderEnabled) {
+      setReorderEnabled(!reorderEnabled);
+      props.onSave(entryList);
     }
   }
 
   return (
     <Fragment>
-      <div style={{
-        width: "inherit",
-        height: "inherit",
-        flex: "1 1 1px",
-        scrollPadding: "48px 0px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "flex-start",
-        alignContent: "stretch"
-      }}>
+      <div
+        style={{
+          width: 'inherit',
+          height: 'inherit',
+          flex: '1 1 1px',
+          scrollPadding: '48px 0px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-start',
+          alignContent: 'stretch',
+        }}
+      >
         <Focusable
           onSecondaryButton={toggleReorderEnabled}
-          onSecondaryActionDescription={reorderEnabled ? "Save Order" : "Reorder"}
+          onSecondaryActionDescription={reorderEnabled ? 'Save Order' : 'Reorder'}
           onClick={toggleReorderEnabled}
           onButtonDown={saveOnBackout}
-          >
-          {
-            entryList.map((entry: ReorderableEntry<T>) => (
-              <ReorderableItem listData={entryList} entryData={entry} reorderEntryFunc={setEntryList} reorderEnabled={reorderEnabled} fieldProps={props.fieldProps} animate={props.animate as boolean} >
-                {props.interactables ? <props.interactables entry={entry} /> : null}
-              </ReorderableItem>
-            ))
-          }
+        >
+          {entryList.map((entry: ReorderableEntry<T>) => (
+            <ReorderableItem
+              animate={props.animate!}
+              listData={entryList}
+              entryData={entry}
+              reorderEntryFunc={setEntryList}
+              reorderEnabled={reorderEnabled}
+              fieldProps={props.fieldProps}
+            >
+              {props.interactables ? <props.interactables entry={entry} /> : null}
+            </ReorderableItem>
+          ))}
         </Focusable>
       </div>
     </Fragment>
@@ -90,17 +101,17 @@ export function ReorderableList<T>(props: ListProps<T>) {
 /**
  * Properties for a ReorderableItem component of type <T>
  */
-type ListEntryProps<T> = {
-  fieldProps?: FieldProps,
-  listData: ReorderableEntry<T>[],
-  entryData: ReorderableEntry<T>,
-  reorderEntryFunc: CallableFunction,
-  reorderEnabled: boolean,
-  animate: boolean,
-  children:ReactElement|null
-}
+export type ReorderableListEntryProps<T> = {
+  fieldProps?: FieldProps;
+  listData: ReorderableEntry<T>[];
+  entryData: ReorderableEntry<T>;
+  reorderEntryFunc: CallableFunction;
+  reorderEnabled: boolean;
+  animate: boolean;
+  children: ReactElement | null;
+};
 
-function ReorderableItem<T>(props: ListEntryProps<T>) {
+function ReorderableItem<T>(props: ReorderableListEntryProps<T>) {
   const [isSelected, _setIsSelected] = useState<boolean>(false);
   const [isSelectedLastFrame, setIsSelectedLastFrame] = useState<boolean>(false);
   const listEntries = props.listData;
@@ -142,32 +153,31 @@ function ReorderableItem<T>(props: ListEntryProps<T>) {
     setIsSelectedLastFrame(val);
   }
 
-
-  return(
+  return (
     <div
-    style={
-      props.animate
-        ? {
-            transition:
-              isSelected || isSelectedLastFrame
-                ? ''
-                : 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1)', // easeOutQuart https://easings.net/#easeOutQuart
-            transform: !props.reorderEnabled || isSelected ? 'scale(1)' : 'scale(0.9)',
-            opacity: !props.reorderEnabled || isSelected ? 1 : 0.7,
-          }
-        : {}
-    }
-  >
-    <Field
-      label={props.entryData.label}
-      {...props.fieldProps}
-      focusable={!props.children}
-      onButtonDown={onReorder}
-      onGamepadBlur={() => setIsSelected(false)}
-      onGamepadFocus={() => setIsSelected(true)}
+      style={
+        props.animate
+          ? {
+              transition:
+                isSelected || isSelectedLastFrame
+                  ? ''
+                  : 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1)', // easeOutQuart https://easings.net/#easeOutQuart
+              transform: !props.reorderEnabled || isSelected ? 'scale(1)' : 'scale(0.9)',
+              opacity: !props.reorderEnabled || isSelected ? 1 : 0.7,
+            }
+          : {}
+      }
     >
-      <Focusable style={{ display: 'flex', width: '100%', position: 'relative' }}>{props.children}</Focusable>
-    </Field>
-  </div>
+      <Field
+        label={props.entryData.label}
+        {...props.fieldProps}
+        focusable={!props.children}
+        onButtonDown={onReorder}
+        onGamepadBlur={() => setIsSelected(false)}
+        onGamepadFocus={() => setIsSelected(true)}
+      >
+        <Focusable style={{ display: 'flex', width: '100%', position: 'relative' }}>{props.children}</Focusable>
+      </Field>
+    </div>
   );
 }
