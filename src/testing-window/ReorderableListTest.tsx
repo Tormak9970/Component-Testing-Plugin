@@ -1,6 +1,6 @@
 import { DialogButton } from "decky-frontend-lib";
 import { ReorderableEntry, ReorderableList } from "../components/ReorderableList";
-import { FaDownload, FaEllipsisH } from "react-icons/fa";
+import { FaCheckCircle, FaDownload, FaEllipsisH } from "react-icons/fa";
 import { Fragment } from "react";
 
 interface StorePluginVersion {
@@ -26,16 +26,45 @@ function UpdateButton(props:UpdateButtonProps<PluginData>) {
 
   return (
     <Fragment>
-      {(data?.update != undefined) && (
+      {(data?.update != undefined) ? (
         <DialogButton
-          style={{ height: '40px', minWidth: '60px', marginRight: '10px' }}
+          style={{
+            height: '40px',
+            minWidth: '60px',
+            marginRight: '10px'
+          }}
           onClick={() => requestPluginInstall(props.entry.label, data?.update)}
           onOKButton={() => requestPluginInstall(props.entry.label, data?.update)}
           onOKActionDescription="Update Plugin"
         >
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row'
+            }}
+          >
             Update to {data?.update?.name}
             <FaDownload style={{ paddingLeft: '2rem' }} />
+          </div>
+        </DialogButton>
+      ) : (
+        <DialogButton
+          style={{
+            height: '40px',
+            minWidth: '60px',
+            marginRight: '10px'
+          }}
+          // disabled={true}
+        >
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row'
+            }}
+          >
+            Up to date
+            {/* Current Version */}
+            <FaCheckCircle style={{ paddingLeft: '4.4rem' }} />
           </div>
         </DialogButton>
       )}
@@ -53,7 +82,19 @@ function ActionButtion(props:ActionButtonProps<PluginData>){
   }
 
   return (
-    <DialogButton style={{ height: "40px", minWidth: "40px", width: "40px", display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }} onClick={() => onAction(props.entry)} onOKButton={() => onAction(props.entry)}>
+    <DialogButton
+      style={{
+        height: "40px",
+        minWidth: "40px",
+        width: "40px",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "10px"
+      }}
+      onClick={() => onAction(props.entry)}
+      onOKButton={() => onAction(props.entry)}
+    >
       <FaEllipsisH />
     </DialogButton>
   );
@@ -67,7 +108,7 @@ function Interactables(props:InteractablesProps<PluginData>) {
   return (
     <Fragment>
       <UpdateButton entry={props.entry} />
-      <ActionButtion  entry={props.entry} />
+      <ActionButtion entry={props.entry} />
     </Fragment>
   );
 }
@@ -99,6 +140,92 @@ export function ReorderableListTester() {
         update: undefined
       },
       position: 2
+    },
+    {
+      label: "Animation Changer",
+      data: {
+        update: undefined
+      },
+      position: 3
+    },
+    {
+      label: "AutoFlatpaks",
+      data: {
+        update: {
+          name: "1.6.4",
+          hash: "",
+          artifact: ""
+        }
+      },
+      position: 4
+    },
+    {
+      label: "Audio Loader",
+      data: {
+        update: undefined
+      },
+      position: 5
+    },
+    {
+      label: "Bluetooth",
+      data: {
+        update: {
+          name: "2.0.2",
+          hash: "",
+          artifact: ""
+        }
+      },
+      position: 6
+    },
+    {
+      label: "Controller Tools",
+      data: {
+        update: undefined
+      },
+      position: 7
+    },
+    {
+      label: "Deck FAQs",
+      data: {
+        update: undefined
+      },
+      position: 8
+    },
+    {
+      label: "Deck Roulette",
+      data: {
+        update: undefined
+      },
+      position: 9
+    },
+    {
+      label: "Deck Settings",
+      data: {
+        update: {
+          name: "1.2.0",
+          hash: "",
+          artifact: ""
+        }
+      },
+      position: 10
+    },
+    {
+      label: "Decky Cloud Save",
+      data: {
+        update: {
+          name: "1.1.1",
+          hash: "",
+          artifact: ""
+        }
+      },
+      position: 11
+    },
+    {
+      label: "Decky Recorder",
+      data: {
+        update: undefined
+      },
+      position: 12
     }
   ];
 
